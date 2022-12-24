@@ -1,0 +1,5 @@
+require_relative 'engine/card'
+require_relative 'engine/user'
+require_relative 'engine/game'
+require_relative 'engine/deck'
+require_relative 'engine/team'
