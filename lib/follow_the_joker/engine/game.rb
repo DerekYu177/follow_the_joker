@@ -16,14 +16,16 @@ module FollowTheJoker
       attr_accessor :users
       attr_reader :current_user, :current_pile, :current_play
 
-      def initialize(round: Card::CURRENT, shuffle_seed: nil)
+      def initialize(round: Card::CURRENT, shuffle_seed: nil, **kwargs)
         @round = round
         @users = []
         @teams = TEAM_NAMES.map { |name| Team.new(name) }
         @users = build_users(@teams)
 
         @deck = Deck.build_with(@users.count)
-        shuffle_seed.nil? ? @deck.cards.shuffle! : @deck.cards.shuffle!(random: Random.new(shuffle_seed))
+
+        shuffle_configuration = { random: (Random.new(shuffle_seed) if shuffle_seed) }.compact
+        @deck.cards.shuffle!(**shuffle_configuration)
 
         @deck.each_user(@users) do |user, cards|
           user.hand_cards!(cards)

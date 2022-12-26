@@ -1,6 +1,22 @@
 #!/usr/bin/env ruby
 
 require 'follow_the_joker/cli'
+require 'follow_the_joker/version'
+require 'cli'
 
-# parse arguments here
-puts FollowTheJoker::Cli.new.start!
+settings = CLI.new do
+  description 'Run Follow the Joker game via CLI'
+  version FollowTheJoker::VERSION
+
+  option(
+    :shuffle_seed,
+    short: :s,
+    default: -1,
+    cast: Integer,
+    description: "Sets the value for Random.new() used for shuffling the deck",
+  )
+end
+
+settings[:shuffle_seed] = nil if settings[:shuffle_seed] < 0
+
+puts FollowTheJoker::Cli.new(**settings).start!

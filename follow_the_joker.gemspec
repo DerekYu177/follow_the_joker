@@ -15,6 +15,8 @@ Gem::Specification.new do |s|
   s.homepage      = ""
   s.license       = "MIT"
 
+  s.add_runtime_dependency "cli", "~> 1.4.0"
+
   s.add_development_dependency "bundler", "~> 2.0"
   s.add_development_dependency "pry", "~> 0.14.1"
   s.add_development_dependency "pry-byebug", "~> 3.10.1"
