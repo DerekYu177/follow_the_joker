@@ -5,7 +5,7 @@ require 'spec_helper'
 RSpec.describe(FollowTheJoker::Engine::Deck) do
   describe '.build' do
     subject do
-      described_class.new.build
+      described_class.build
     end
 
     it 'contains 54 cards' do

@@ -71,10 +71,6 @@ module FollowTheJoker
         @current = current
       end
 
-      def <=>(card)
-        rank <=> card.rank
-      end
-
       def inspect
         "<#{[self.class.humanize_rank(self), suit].compact.join(" of ")}>"
       end

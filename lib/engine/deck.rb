@@ -9,37 +9,40 @@ module FollowTheJoker
       CARDS_PER_HAND = CARDS_PER_DECK / 2
 
       class << self
-        def deal!(users:)
-          # reject if users is an odd number
+        def build_with(user_count)
+          cards = (user_count / 2).times.map { self.build }.flatten
+          Deck.new(cards)
+        end
 
-          number_of_users = users.count
-          number_of_decks = number_of_users / 2
-          set = number_of_decks.times.map { self.new.build }.flatten
-          set.shuffle!
+        def build
+          cards = []
 
-          # each user gets half a deck
-          dealt_cards = set.each_slice(CARDS_PER_HAND).to_a
-
-          users.zip(dealt_cards).each do |user, hand|
-            user.deal!(hand)
+          Card::SUITS.each do |suit|
+            Card::SUIT_CARD_RANKS.each do |value|
+              cards << Card.new(suit: suit, rank: value)
+            end
           end
+
+          Card::JOKER_CARD_RANKS.each do |value|
+            cards << Card.new(rank: value)
+          end
+
+          cards
         end
       end
 
-      def build
-        cards = []
+      attr_accessor :cards
 
-        Card::SUITS.each do |suit|
-          Card::SUIT_CARD_RANKS.each do |value|
-            cards << Card.new(suit: suit, rank: value)
-          end
-        end
+      def initialize(cards)
+        # assume already shuffled
+        # correct with the number of users
+        @cards = cards
+      end
 
-        Card::JOKER_CARD_RANKS.each do |value|
-          cards << Card.new(rank: value)
-        end
-
-        cards
+      def each_user(users)
+        # each user gets half a deck
+        cards_per_user = @cards.each_slice(CARDS_PER_HAND).to_a
+        users.zip(cards_per_user) { |user, cards| yield(user, cards) }
       end
     end
   end

@@ -5,44 +5,37 @@ module FollowTheJoker
     class User
       attr_accessor :name, :cards, :team, :pile
 
-      def initialize(name, team:, pile:)
+      def initialize(name, team:)
         @name = name
 
         @team = team
         @team.join!(self)
-
-        @pile = pile
       end
 
-      def deal!(cards)
+      def hand_cards!(cards)
         @original_cards = cards.dup
-        @cards = cards.sort
+        @cards = cards.sort_by { |card| card.rank }
       end
 
-      def play!(cards)
-        check_hand_is_subset_of_cards!
-
-        pile.add(cards: cards, user: self)
-
-        # adding the cards to the pile could raise, so we want to remove the cards later
+      def played!(cards)
         cards.each { |card| self.cards.delete(card) }
       end
 
       def inspect
         "<#{name} (team #{team.name}) with #{cards.count} cards remaining>"
       end
+      alias_method :to_s, :inspect
 
       def hand
-        cards.map { |card| "\t#{card.shorthand}\t#{card}" }.join("\n")
+        cards
+          .map { |card| "\t#{card.shorthand}\t\t#{card}" }
+          .join("\n")
+          .prepend("\tShorthand\tCard\n")
       end
 
       def current_card=(current)
         cards.select { |card| card.rank == current }.map(&:promote!)
-      end
-
-      private
-
-      def check_hand_is_subset_of_cards!
+        cards.sort_by! { |card| card.rank }
       end
     end
   end

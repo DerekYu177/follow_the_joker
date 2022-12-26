@@ -3,16 +3,20 @@
 require 'pry'
 require_relative 'engine'
 require_relative 'engine/game'
+require_relative 'engine/play'
 
 module FollowTheJoker
-  class Cli
-    def initialize
-      @game = Engine::Game.new
-    end
-
+  class Cli < Engine::Game
     def start!
-      while true do
-        @game.users.each { |user| complete_turn!(user) }
+      loop do
+        puts
+        puts "Current player: #{current_user}"
+        puts available_commands
+
+        input = gets.chomp
+        action, info = parse_action(input)
+
+        play(current_user, action: action, **info)
       end
     rescue Interrupt
       puts
@@ -21,33 +25,57 @@ module FollowTheJoker
 
     private
 
-    def complete_turn!(user)
-      while true do
-        puts "#{user.inspect}'s turn"
-        puts "Type ? for help"
+    def available_commands
+      "Type '?' for your cards | " \
+        "Type '*' to see cards played this round | " \
+        "Type '...' to skip your turn | " \
+        "Type the shorthand for your card to play it"
+    end
 
-        input = gets.chomp
-
-        if input == "?"
-          puts "#{user.inspect}"
-          puts "#{user.hand}"
-        elsif input == "skip"
-          break
-        elsif input == "pile"
-          puts @game.pile.current_play
-        else # assume valid move?
-          cards = parse(input, user.cards)
-          begin
-            user.play!(cards)
-            break
-          rescue Engine::Pile::HandError => e
-            puts e.class.name
-          end
-        end
+    def parse_action(input)
+      if input == "?"
+        [:help, {}]
+      elsif input.include?(" ") || input.include?("-") # assume cards
+        [:play, { cards: find_cards(input) }]
+      elsif input == "*"
+        [:pile, {}]
+      elsif input == "..."
+        [:skip, {}]
+      else
+        [input.to_sym, {}]
       end
     end
 
-    def parse(input, cards)
+    def play(user, action:, **kwargs)
+      case action
+      when :help
+        puts
+        puts "#{user.inspect}"
+        puts "#{user.hand}"
+        return
+      when :pile
+        puts
+        if current_pile.empty?
+          puts "You're the first to play this round!"
+        else
+          puts "Most recent first:"
+          puts current_play.reverse
+        end
+
+        return
+      when :play, :skip
+        begin
+          super
+        rescue FollowTheJoker::Engine::Play::HandError => e
+          puts "**ERROR** #{e.message.to_s}"
+          return
+        end
+      else
+        raise "unknown action: #{action}"
+      end
+    end
+
+    def find_cards(input)
       # input takes the rank-suit
       # i.e. Ace of Spades = A-S
       # ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K, A]
@@ -60,7 +88,7 @@ module FollowTheJoker
         suit = Engine::Card::SUIT_SHORTHANDS[suit_shorthand]
         rank = Engine::Card.expand_rank_shorthand(rank_shorthand)
 
-        cards.find { |card| card.original_rank == rank && card.suit == suit }
+        current_user.cards.find { |card| card.original_rank == rank && card.suit == suit }
       end
     end
   end
