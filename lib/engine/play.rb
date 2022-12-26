@@ -10,7 +10,7 @@ module FollowTheJoker
         alias_method :to_s, :inspect
       end
 
-      class HandError < StandardError
+      class CardsError < StandardError
         attr_reader :previous, :current
         def initialize(previous, current)
           @previous = previous
@@ -18,17 +18,33 @@ module FollowTheJoker
         end
       end
 
-      class IllegalHandSizeError < HandError; end
-      class GreaterHandRequiredError < HandError
+      class FourCardsError < CardsError; end
+
+      class GreaterCardsRankRequiredError < CardsError
         def message
-          "Previous hand was #{previous} with rank #{previous.map(&:rank)}. " \
-          "Current hand was #{current} with rank #{current.map(&:rank)}"
+          previous_rank = previous.map(&:rank).uniq.first
+          current_rank = current.map(&:rank).uniq.first
+
+          "Previous hand was #{previous} with rank #{previous_rank}. " \
+          "You'll need to play a card(s) with rank of at least #{previous_rank + 1}. " \
+          "You currently played #{current} with rank #{current_rank}"
         end
       end
-      class HandSizeMismatchError < HandError
+
+      class CardCountMismatchError < CardsError
         def message
           "Previous hand was #{previous} with size #{previous.size}. " \
           "Current hand was #{current}, with size #{current.size}"
+        end
+      end
+
+      class CardRankNotSame < CardsError
+        def message
+          cards = current.group_by { |card| card.rank }.values
+          minority = cards.min { |a, b| a.size <=> b.size }
+          majority = cards.flatten - minority
+
+          "Card(s) #{minority.map(&:to_s)} should be a #{majority.first.humanized_rank}"
         end
       end
 
@@ -40,14 +56,24 @@ module FollowTheJoker
       end
 
       def valid?
+        case cards.size
+        when 1, 2, 3
+          raise CardRankNotSame.new(previous_cards, cards) unless equivalent_card_ranks?
+        when 4
+          raise FourCardsError
+        when 5
+          raise 'not supported yet'
+        end
+
         return true if previous_cards.empty?
-        raise HandSizeMismatchError.new(previous_cards, cards) unless same_size_hand?
+
+        raise CardCountMismatchError.new(previous_cards, cards) unless same_size_hand?
 
         case previous_cards.size
         when 1, 2, 3
-          raise GreaterHandRequiredError.new(previous_cards, cards) unless greater_hand?
+          raise GreaterCardsRankRequiredError.new(previous_cards, cards) unless greater_hand?
         when 4
-          raise IllegalHandSizeError
+          raise FourCardsError
         when 5
           raise 'not supported yet'
         end
@@ -58,6 +84,10 @@ module FollowTheJoker
       end
 
       private
+
+      def equivalent_card_ranks?
+        cards.map(&:rank).uniq.size == 1
+      end
 
       def same_size_hand?
         previous_cards.size == cards.size

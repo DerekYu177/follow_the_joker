@@ -90,6 +90,10 @@ module FollowTheJoker
         [rank_shorthand, suit_shorthand].compact.join("-")
       end
 
+      def humanized_rank
+        self.class.humanize_rank(self)
+      end
+
       private
 
       def rank_shorthand

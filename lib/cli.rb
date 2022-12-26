@@ -66,12 +66,13 @@ module FollowTheJoker
       when :play, :skip
         begin
           super
-        rescue FollowTheJoker::Engine::Play::HandError => e
+        rescue FollowTheJoker::Engine::Play::CardsError => e
           puts "**ERROR** #{e.message.to_s}"
           return
         end
       else
-        raise "unknown action: #{action}"
+        puts "unknown action: #{action}"
+        return
       end
     end
 
