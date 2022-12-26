@@ -34,7 +34,7 @@ module FollowTheJoker
         @current_play = []
         @current_user_index = 0
         @current_user = @users.first
-        @skip_counter = 0
+        @current_skip_counter = 0
       end
 
       def play(user, action:, **kwargs)
@@ -49,9 +49,10 @@ module FollowTheJoker
           @current_pile << cards.dup
           @current_play << play.record_with(user)
           user.played!(cards)
+          @current_skip_counter = 0
         when :skip
           raise CannotSkipError if @current_pile.empty?
-          @skip_counter += 1
+          @current_skip_counter += 1
         else
           raise "unknown action: #{action}"
         end
@@ -61,6 +62,7 @@ module FollowTheJoker
         if end_round?
           @current_play = []
           @current_pile = []
+          @current_skip_counter = 0
         end
 
         @current_user = next_user
@@ -73,7 +75,7 @@ module FollowTheJoker
       end
 
       def end_round?
-        @skip_counter == @users.count - 1
+        @current_skip_counter == @users.count - 1
       end
 
       def next_user

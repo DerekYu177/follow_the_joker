@@ -18,13 +18,13 @@ module FollowTheJoker
           cards = []
 
           Card::SUITS.each do |suit|
-            Card::SUIT_CARD_RANKS.each do |value|
-              cards << Card.new(suit: suit, rank: value)
+            Card::SUIT_CARD_RANKS.each do |rank|
+              cards << Card.new(rank, suit: suit)
             end
           end
 
-          Card::JOKER_CARD_RANKS.each do |value|
-            cards << Card.new(rank: value)
+          Card::JOKER_CARD_RANKS.each do |rank|
+            cards << Card.new(rank)
           end
 
           cards

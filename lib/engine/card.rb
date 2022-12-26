@@ -60,7 +60,7 @@ module FollowTheJoker
         end
       end
 
-      def initialize(rank:, suit: nil, current: nil)
+      def initialize(rank, suit: nil, current: nil)
         validate_rank!
         validate_suit!
         validate_current!

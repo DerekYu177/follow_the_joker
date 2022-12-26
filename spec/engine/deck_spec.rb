@@ -13,7 +13,7 @@ RSpec.describe(FollowTheJoker::Engine::Deck) do
     end
 
     it 'contains 2 jokers, one big, one small' do
-      jokers = subject.select(&:joker?).sort
+      jokers = subject.select(&:joker?).sort_by(&:rank)
       expect(jokers.size).to(eq(2))
       expect(jokers.map(&:rank)).to(eq([16, 17]))
     end

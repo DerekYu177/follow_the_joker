@@ -14,7 +14,7 @@ module FollowTheJoker
 
       def hand_cards!(cards)
         @original_cards = cards.dup
-        @cards = cards.sort_by { |card| card.rank }
+        @cards = cards.sort_by(&:rank)
       end
 
       def played!(cards)
@@ -35,7 +35,7 @@ module FollowTheJoker
 
       def current_card=(current)
         cards.select { |card| card.rank == current }.map(&:promote!)
-        cards.sort_by! { |card| card.rank }
+        cards.sort_by!(&:rank)
       end
     end
   end

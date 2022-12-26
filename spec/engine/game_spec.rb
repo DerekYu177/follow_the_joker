@@ -47,11 +47,25 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
       cards = user.cards[-1] # Big Joker
       game.play(user, action: :play, cards: cards)
 
-      game.users.rotate(4)[0...-1].each do |current_user|
-        user = game.current_user
-        expect(user).to(eq(current_user))
-        game.play(user, action: :skip)
-      end
+      user = game.current_user
+      expect(user).to(eq(user_5_team_1))
+      game.play(user, action: :skip)
+
+      user = game.current_user
+      expect(user).to(eq(user_6_team_2))
+      game.play(user, action: :skip)
+
+      user = game.current_user
+      expect(user).to(eq(user_1_team_1)) # loop back!
+      game.play(user, action: :skip)
+
+      user = game.current_user
+      expect(user).to(eq(user_2_team_2)) # loop back!
+      game.play(user, action: :skip)
+
+      user = game.current_user
+      expect(user).to(eq(user_3_team_1)) # loop back!
+      game.play(user, action: :skip)
 
       user = game.current_user
       expect(user).to(eq(user_4_team_2)) # should be turn again

@@ -3,6 +3,7 @@ require_relative 'engine/user'
 require_relative 'engine/game'
 require_relative 'engine/deck'
 require_relative 'engine/team'
+require_relative 'engine/five_cards_play'
 
 module FollowTheJoker
   module Engine
@@ -49,6 +50,19 @@ module FollowTheJoker
     class CannotSkipError < EngineError
       def message
         "You cannot skip your turn if you're the first one playing!"
+      end
+    end
+
+    class InvalidSetOfFiveError < CardsError
+      def message
+        "Not a valid set of five. " \
+        "You played: #{current}"
+      end
+    end
+
+    class GreaterFiveCardsRankRequiredError < CardsError
+      def message
+        "Your set of #{current} was not greater than the previous set of #{previous}"
       end
     end
   end

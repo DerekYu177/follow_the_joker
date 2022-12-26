@@ -12,7 +12,7 @@ module FollowTheJoker
         puts "Current player: #{current_user}"
         puts available_commands
 
-        input = gets.chomp
+        input = gets.chomp.strip
         action, info = parse_action(input)
 
         play(current_user, action: action, **info)
@@ -40,6 +40,8 @@ module FollowTheJoker
         [:pile, {}]
       elsif input == "..."
         [:skip, {}]
+      elsif input == "debug"
+        [:debug, {}]
       else
         [input.to_sym, {}]
       end
@@ -69,6 +71,8 @@ module FollowTheJoker
           puts "**ERROR** #{e.message.to_s}"
           return
         end
+      when :debug
+        binding.pry
       else
         puts "unknown action: #{action}"
         return
@@ -98,6 +102,10 @@ module FollowTheJoker
       end
     end
   end
+end
+
+ARGV.each do |arg|
+  # accept seed
 end
 
 FollowTheJoker::Cli.new.start!

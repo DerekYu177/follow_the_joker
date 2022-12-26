@@ -24,7 +24,7 @@ module FollowTheJoker
         when 4
           raise FourCardsError
         when 5
-          raise 'not supported yet'
+          raise InvalidSetOfFiveError.new(previous_cards, cards) unless FiveCardsPlay.new(cards).valid?
         end
 
         return true if previous_cards.empty?
@@ -37,7 +37,7 @@ module FollowTheJoker
         when 4
           raise FourCardsError
         when 5
-          raise 'not supported yet'
+          raise GreaterFiveCardsRankRequiredError.new() unless greater_set_of_five?
         end
       end
 
@@ -46,6 +46,14 @@ module FollowTheJoker
       end
 
       private
+
+      def greater_set_of_five?
+        previous = FiveCardsPlay.new(previous_cards).value
+        current = FiveCardsPlay.new(cards).value
+        return false if previous == current
+
+        [ previous, current ].max == current
+      end
 
       def equivalent_card_ranks?
         cards.map(&:rank).uniq.size == 1
