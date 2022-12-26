@@ -94,15 +94,23 @@ module FollowTheJoker
       # ranks = [2, 3, 4, 5, 6, 7, 8, 9, 10, J, Q, K, A]
       # suits = [Diamonds = d, Clubs = c, Hearts = h, Spades = s)]
       # for Jokers, theres !, and !*, for little joker and big joker respectively
+      cards = []
 
-      input.split.map do |command|
+      input.split.each do |command|
         rank_shorthand, suit_shorthand = command.split("-")
 
         suit = Engine::Card::SUIT_SHORTHANDS[suit_shorthand]
         rank = Engine::Card.expand_rank_shorthand(rank_shorthand)
 
-        current_user.cards.find { |card| card.original_rank == rank && card.suit == suit }
+        card = current_user
+          .cards
+          .reject { |card| cards.include?(card) }
+          .find { |card| card.original_rank == rank && card.suit == suit }
+
+        cards << card
       end
+
+      cards
     end
   end
 end
