@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'pry'
+require 'pry-byebug'
 require_relative 'engine'
 require_relative 'engine/game'
 
@@ -73,6 +74,8 @@ module FollowTheJoker
         end
       when :debug
         binding.pry
+        # random statement here
+        puts
       else
         puts "unknown action: #{action}"
         return
@@ -103,9 +106,3 @@ module FollowTheJoker
     end
   end
 end
-
-ARGV.each do |arg|
-  # accept seed
-end
-
-FollowTheJoker::Cli.new.start!

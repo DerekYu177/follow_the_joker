@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+require 'follow_the_joker/cli'
+
+# parse arguments here
+puts FollowTheJoker::Cli.new.start!
