@@ -3,7 +3,6 @@
 require 'pry'
 require_relative 'engine'
 require_relative 'engine/game'
-require_relative 'engine/play'
 
 module FollowTheJoker
   class Cli < Engine::Game
@@ -66,13 +65,19 @@ module FollowTheJoker
       when :play, :skip
         begin
           super
-        rescue FollowTheJoker::Engine::Play::CardsError => e
+        rescue FollowTheJoker::Engine::EngineError => e
           puts "**ERROR** #{e.message.to_s}"
           return
         end
       else
         puts "unknown action: #{action}"
         return
+      end
+    end
+
+    def end_round?
+      super.tap do |result|
+        puts "No one challenged you! You may go again" if result
       end
     end
 

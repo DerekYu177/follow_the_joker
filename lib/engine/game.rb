@@ -50,8 +50,8 @@ module FollowTheJoker
           @current_play << play.record_with(user)
           user.played!(cards)
         when :skip
+          raise CannotSkipError if @current_pile.empty?
           @skip_counter += 1
-          # do nothing
         else
           raise "unknown action: #{action}"
         end
