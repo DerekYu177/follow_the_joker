@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'follow_the_joker/version'
+
 Gem::Specification.new do |s|
-  s.name          = "FollowTheJoker"
+  s.name          = "follow_the_joker"
   s.version       = FollowTheJoker::VERSION
   s.summary       = "A game engine for the popular game 大怪路子."
   s.description   = "A game engine for the popular game 大怪路子."
@@ -12,6 +16,7 @@ Gem::Specification.new do |s|
   s.license       = "MIT"
 
   s.add_development_dependency "bundler", "~> 2.0"
-  s.add_development_dependency "pry"
+  # s.add_development_dependency "pry"
   s.add_development_dependency "pry-byebug"
+  s.required_ruby_version = ">= 3.0.2"
 end
