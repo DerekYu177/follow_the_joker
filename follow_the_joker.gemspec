@@ -20,5 +20,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "bundler", "~> 2.0"
   s.add_development_dependency "pry", "~> 0.14.1"
   s.add_development_dependency "pry-byebug", "~> 3.10.1"
+  s.add_development_dependency "rspec-core", "~> 3.12.0"
+  s.add_development_dependency "rspec-expectations", "~> 3.12.0"
+  s.add_development_dependency "rspec-mocks", "~> 3.12.0"
   s.required_ruby_version = ">= 3.0.2"
 end

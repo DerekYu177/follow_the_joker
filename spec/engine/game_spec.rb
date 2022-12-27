@@ -10,7 +10,7 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
   end
 
   it 'splits the users into two teams' do
-    teams = subject.users.partition { |u| u.team.name == described_class::TEAM_NAMES.first }
+    teams = subject.users.partition { |u| u.team.name == 1 }
     expect(teams.size).to(eq(2))
 
     teams.each do |team|
@@ -70,6 +70,24 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
       user = game.current_user
       expect(user).to(eq(user_4_team_2)) # should be turn again
       expect(user.cards.count).to(eq(25))
+    end
+
+    context 'when one person finishes' do
+      let(:game) { described_class.new(shuffle_seed: 0) }
+
+      it 'considers that person "帮龙头"' do
+        user = game.current_user
+
+        user.cards.reverse.each do |card| # modifying the array in place, so do it opposite to array iteration direction
+          game.play(user, action: :play, cards: card)
+
+          (game.users - [user]).each do |other|
+            game.play(other, action: :skip)
+          end
+        end
+
+        expect(user.cards).to(be_empty)
+      end
     end
   end
 end

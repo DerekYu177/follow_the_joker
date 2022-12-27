@@ -12,6 +12,18 @@ module FollowTheJoker
         @team.join!(self)
       end
 
+      def finished?
+        @cards.empty?
+      end
+
+      def dragon_head!
+        @team.dragon_head = self
+      end
+
+      def jail!
+        @team.jail << self
+      end
+
       def hand_cards!(cards)
         @original_cards = cards.dup
         @cards = cards.sort_by(&:rank)

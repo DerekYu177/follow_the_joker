@@ -60,7 +60,7 @@ module FollowTheJoker
         end
       end
 
-      def initialize(rank, suit: nil, current: nil)
+      def initialize(rank, suit: nil)
         validate_rank!
         validate_suit!
         validate_current!
@@ -68,7 +68,6 @@ module FollowTheJoker
         @original_rank = rank.dup
         @rank = rank
         @suit = suit
-        @current = current
       end
 
       def inspect
@@ -77,7 +76,6 @@ module FollowTheJoker
       alias_method :to_s, :inspect
 
       def promote!
-        @current = true
         @rank = PROMOTED_RANK
       end
 

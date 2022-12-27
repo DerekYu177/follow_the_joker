@@ -15,8 +15,20 @@ settings = CLI.new do
     cast: Integer,
     description: "Sets the value for Random.new() used for shuffling the deck",
   )
+  option(
+    :number_of_users,
+    short: :n,
+    default: 6,
+    cast: Integer,
+    description: "Sets the number of users. Must be an even number. Minimum 2."
+  )
+end.parse! do |settings|
+  unless settings.number_of_users.even? && settings.number_of_users >= 2
+    fail "Number of users must be an even number >= 2"
+  end
 end
 
-settings[:shuffle_seed] = nil if settings[:shuffle_seed] < 0
+settings.shuffle_seed = nil if settings.shuffle_seed < 0
 
-puts FollowTheJoker::Cli.new(**settings).start!
+loop { ARGV.any? ? ARGV.pop : break } # breaks CLI
+FollowTheJoker::Cli.new(**settings.to_h).start!
