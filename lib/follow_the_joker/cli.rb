@@ -48,7 +48,7 @@ module FollowTheJoker
       end
     end
 
-    def play(user, action:, **kwargs)
+    def turn(user, action:, **kwargs)
       case action
       when :help
         puts

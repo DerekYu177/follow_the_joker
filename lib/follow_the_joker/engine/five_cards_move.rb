@@ -2,7 +2,7 @@
 
 module FollowTheJoker
   module Engine
-    class FiveCardsPlay
+    class FiveCardsMove
       FLUSH = 1
       STRAIGHT = 2
       THREE_PLUS_TWO = 3

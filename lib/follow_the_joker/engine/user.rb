@@ -20,7 +20,7 @@ module FollowTheJoker
         @team.dragon_head = self
       end
 
-      def jail!
+      def lost!
         @team.jail << self
       end
 

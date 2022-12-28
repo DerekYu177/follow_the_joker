@@ -3,7 +3,8 @@
 require_relative 'deck'
 require_relative 'card'
 require_relative 'team'
-require_relative 'play'
+require_relative 'move'
+require_relative 'round'
 
 module FollowTheJoker
   module Engine
@@ -11,11 +12,14 @@ module FollowTheJoker
       FAMILY_MEMBERS = %w(Ba Ma R RR)
 
       attr_accessor :users
-      attr_reader :current_user, :current_pile, :current_play
+      attr_reader(
+        :configuration,
+        :teams,
+        :round
+      )
 
       def initialize(**configuration)
         configuration = {
-          round: Card::CURRENT,
           shuffle_seed: nil,
           number_of_users: 6,
           number_of_teams: 2,
@@ -23,89 +27,34 @@ module FollowTheJoker
 
         @configuration = configuration
 
-        round = configuration[:round]
         @teams = configuration[:number_of_teams].times.map { |i| Team.new(i+1) }
+        @teams.first.initiative = true
         @users = build_users(configuration[:number_of_users], teams: @teams)
 
-        @deck = Deck.build_with(@users.count)
-
-        shuffle_seed = configuration[:shuffle_seed]
-        shuffle_configuration = { random: (Random.new(shuffle_seed) if shuffle_seed) }.compact
-        @deck.cards.shuffle!(**shuffle_configuration)
-
-        @deck.each_user(@users) do |user, cards|
-          user.hand_cards!(cards)
-          user.current_card = round
-        end
-
-        @current_pile = []
-        @current_play = []
-        @current_user_index = 0
-        @current_user = @users.first
-        @current_skip_counter = 0
+        @round = Round.new(self, priority_card: @teams.first.priority_card)
+        @previous_rounds = []
       end
 
-      def play(user, action:, **kwargs)
-        case action
-        when :play
-          cards = [*kwargs.delete(:cards)]
+      def turn(...)
+        @round.turn(...)
+      end
 
-          play = Play.new([*@current_pile.last], cards)
-          play.valid?
+      def current_user
+        @round.current.user
+      end
 
-          # unless valid? raised
-          @current_pile << cards.dup
-          @current_play << play.record_with(user)
-          user.played!(cards)
+      def round_finished!
+        @teams.each(&:round_finished!)
+        @previous_rounds << @round
 
-          user.dragon_head! if dragon_head?(user)
-          end_round! if other_team_in_jail?
-          @current_skip_counter = 0
-        when :skip
-          raise CannotSkipError if @current_pile.empty?
-          @current_skip_counter += 1
+        winning_team = @teams.select(&:dragon_head?).first
+      end
 
-          if everyone_skipped?
-            @current_play = []
-            @current_pile = []
-            @current_skip_counter = 0
-          end
-        else
-          raise "unknown action: #{action}"
-        end
-
-        next_user!
+      def next_round!
+        @round = Round.new(self, priority_card: winning_team.priority_card)
       end
 
       private
-
-      def end_round!
-        users.reject(&:finished?).each(&:jail!)
-      end
-
-      def other_team_in_jail?
-        users.reject(&:finished?).map { |u| u.team.name }.uniq == 1
-      end
-
-      def dragon_head?(user)
-        user.cards.empty? && (users - [user]).all? { |u| u.cards }
-      end
-
-      def everyone_skipped?
-        @current_skip_counter == @users.count - 1
-      end
-
-      def next_user!
-        unless defined?(@current_user_index)
-          @current_user_index = 0
-          return @users.first
-        end
-
-        @current_user_index = (@current_user_index + 1) % @users.count
-        @current_user = @users[@current_user_index]
-
-        next_user! if @current_user.finished?
-      end
 
       def build_users(number_of_users, teams:)
         users = []

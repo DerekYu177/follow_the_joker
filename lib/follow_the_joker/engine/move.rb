@@ -2,7 +2,7 @@
 
 module FollowTheJoker
   module Engine
-    class Play
+    class Move
       Record = Struct.new(:cards, :user, keyword_init: true) do
         def inspect
           "#{cards} played by #{user}"
@@ -24,7 +24,7 @@ module FollowTheJoker
         when 4
           raise FourCardsError
         when 5
-          raise InvalidSetOfFiveError.new(previous_cards, cards) unless FiveCardsPlay.new(cards).valid?
+          raise InvalidSetOfFiveError.new(previous_cards, cards) unless FiveCardsMove.new(cards).valid?
         end
 
         return true if previous_cards.empty?
@@ -42,14 +42,14 @@ module FollowTheJoker
       end
 
       def record_with(user)
-        Record.new(cards: cards, user: user)
+        Record.new(cards: cards, user: user).to_s
       end
 
       private
 
       def greater_set_of_five?
-        previous = FiveCardsPlay.new(previous_cards).value
-        current = FiveCardsPlay.new(cards).value
+        previous = FiveCardsMove.new(previous_cards).value
+        current = FiveCardsMove.new(cards).value
         return false if previous == current
 
         [ previous, current ].max == current

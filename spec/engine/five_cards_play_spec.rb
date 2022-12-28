@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-RSpec.describe(FollowTheJoker::Engine::FiveCardsPlay) do
+RSpec.describe(FollowTheJoker::Engine::FiveCardsMove) do
   subject do
     described_class.new(cards)
   end

@@ -3,7 +3,7 @@ require_relative 'engine/user'
 require_relative 'engine/game'
 require_relative 'engine/deck'
 require_relative 'engine/team'
-require_relative 'engine/five_cards_play'
+require_relative 'engine/five_cards_move'
 
 module FollowTheJoker
   module Engine
@@ -63,6 +63,12 @@ module FollowTheJoker
     class GreaterFiveCardsRankRequiredError < CardsError
       def message
         "Your set of #{current} was not greater than the previous set of #{previous}"
+      end
+    end
+
+    class RoundAlreadyFinishedError < EngineError
+      def message
+        "Further moves cannot be played because the match has finished."
       end
     end
   end

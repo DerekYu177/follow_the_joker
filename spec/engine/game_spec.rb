@@ -27,45 +27,59 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
     let(:user_5_team_1) { game.users[4] }
     let(:user_6_team_2) { game.users[5] }
 
+    def finish(user)
+      user.cards.reverse.each do |card|
+        game.turn(user, action: :play, cards: card)
+
+        if !game.round.finished? && !user.finished?
+          until game.current_user == user
+            game.turn(game.current_user, action: :skip)
+          end
+        end
+      end
+
+      expect(user.cards).to(be_empty)
+    end
+
     it 'one round with singles' do
       user = game.current_user
       expect(user).to(eq(user_1_team_1))
       cards = user.cards.first # 3 of Hearts
-      game.play(user, action: :play, cards: cards)
+      game.turn(user, action: :play, cards: cards)
 
       user = game.current_user
       expect(user).to(eq(user_2_team_2))
       cards = user.cards[4] # 4 of Spades
-      game.play(user, action: :play, cards: cards)
+      game.turn(user, action: :play, cards: cards)
 
       user = game.current_user
       expect(user).to(eq(user_3_team_1))
-      game.play(user, action: :skip)
+      game.turn(user, action: :skip)
 
       user = game.current_user
       expect(user).to(eq(user_4_team_2))
       cards = user.cards[-1] # Big Joker
-      game.play(user, action: :play, cards: cards)
+      game.turn(user, action: :play, cards: cards)
 
       user = game.current_user
       expect(user).to(eq(user_5_team_1))
-      game.play(user, action: :skip)
+      game.turn(user, action: :skip)
 
       user = game.current_user
       expect(user).to(eq(user_6_team_2))
-      game.play(user, action: :skip)
+      game.turn(user, action: :skip)
 
       user = game.current_user
       expect(user).to(eq(user_1_team_1)) # loop back!
-      game.play(user, action: :skip)
+      game.turn(user, action: :skip)
 
       user = game.current_user
       expect(user).to(eq(user_2_team_2)) # loop back!
-      game.play(user, action: :skip)
+      game.turn(user, action: :skip)
 
       user = game.current_user
       expect(user).to(eq(user_3_team_1)) # loop back!
-      game.play(user, action: :skip)
+      game.turn(user, action: :skip)
 
       user = game.current_user
       expect(user).to(eq(user_4_team_2)) # should be turn again
@@ -77,16 +91,47 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
 
       it 'considers that person "帮龙头"' do
         user = game.current_user
+        finish(user)
+        expect(user.team.dragon_head).to(eq(user_1_team_1))
 
-        user.cards.reverse.each do |card| # modifying the array in place, so do it opposite to array iteration direction
-          game.play(user, action: :play, cards: card)
+        # check that the winner isn't called the next time around
 
-          (game.users - [user]).each do |other|
-            game.play(other, action: :skip)
+        user = game.current_user
+        expect(user).to(eq(user_2_team_2))
+        card = user.cards.first
+        game.turn(user, action: :play, cards: card)
+
+        (game.users - [user, user_1_team_1]).each do |other|
+          game.turn(other, action: :skip)
+        end
+
+        expect(user).to(eq(user_2_team_2))
+      end
+    end
+
+    context 'when one team has finished' do
+      it 'locks the other team in' do
+        game.users.each_slice(2).each do |winning_team_user, losing_team_user|
+          finish(winning_team_user)
+
+          unless game.round.finished?
+            expect(game.current_user).to(eq(losing_team_user))
+            game.turn(losing_team_user, action: :play, cards: losing_team_user.cards.first)
           end
         end
 
-        expect(user.cards).to(be_empty)
+        winning_team = game.teams.first
+        winning_team.users.each do |user|
+          expect(user).to(be_finished)
+        end
+
+        losing_team = game.teams.last
+        losing_team.users.each do |user|
+          expect(user).not_to(be_finished)
+        end
+
+        expect(losing_team.jail).to(eq(losing_team.users))
+        expect(winning_team.priority_card).to(eq(5))
       end
     end
   end
