@@ -73,7 +73,7 @@ module FollowTheJoker
       end
 
       def skip(user)
-        if @current.first_round?
+        if @current.first_move?
           binding.pry
           raise CannotSkipError
         else

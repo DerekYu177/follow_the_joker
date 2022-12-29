@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'follow_the_joker/cli'
+require 'follow_the_joker/cli/game'
 require 'follow_the_joker/version'
 require 'cli'
 
-settings = CLI.new do
+settings = ::CLI.new do
   description 'Run Follow the Joker game via CLI'
   version FollowTheJoker::VERSION
 
@@ -31,4 +31,4 @@ end
 settings.shuffle_seed = nil if settings.shuffle_seed < 0
 
 loop { ARGV.any? ? ARGV.pop : break } # breaks CLI
-FollowTheJoker::Cli.new(**settings.to_h).start!
+FollowTheJoker::CLI::Game.new(**settings.to_h).start!

@@ -48,7 +48,7 @@ module FollowTheJoker
         @pile.last.to_a
       end
 
-      def first_round?
+      def first_move?
         @pile.empty?
       end
 

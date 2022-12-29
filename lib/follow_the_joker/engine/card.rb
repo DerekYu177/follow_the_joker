@@ -3,15 +3,7 @@
 module FollowTheJoker
   module Engine
     class Card
-      CURRENT = 2
-
-      SUIT_SHORTHANDS = {
-        "d" => "Diamonds",
-        "c" => "Clubs",
-        "h" => "Hearts",
-        "s" => "Spades",
-      }
-      SUITS = SUIT_SHORTHANDS.values
+      SUITS = %w(Diamonds Clubs Hearts Spades)
 
       NUMBER_CARD_RANKS = [*2..10]
       FACE_CARD_RANKS = [
@@ -45,19 +37,6 @@ module FollowTheJoker
             card.rank.to_s
           end
         end
-
-        def expand_rank_shorthand(shorthand)
-          case shorthand
-          when "J" then JACK
-          when "Q" then QUEEN
-          when "K" then KING
-          when "A" then ACE
-          when "!" then LITTLE_JOKER
-          when "!*" then BIG_JOKER
-          else
-            shorthand.to_i
-          end
-        end
       end
 
       def initialize(rank, suit: nil)
@@ -83,33 +62,11 @@ module FollowTheJoker
         suit.nil? && JOKER_CARD_RANKS.include?(rank)
       end
 
-      def shorthand
-        # rank-suit
-        [rank_shorthand, suit_shorthand].compact.join("-")
-      end
-
       def humanized_rank
         self.class.humanize_rank(self)
       end
 
       private
-
-      def rank_shorthand
-        case original_rank
-        when JACK then "J"
-        when QUEEN then "Q"
-        when KING then "K"
-        when ACE then "A"
-        when LITTLE_JOKER then "!"
-        when BIG_JOKER then "!*"
-        else
-          original_rank.to_s
-        end
-      end
-
-      def suit_shorthand
-        SUIT_SHORTHANDS.to_a.each(&:reverse!).to_h[suit]
-      end
 
       def validate_rank!
       end
