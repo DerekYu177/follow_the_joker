@@ -37,6 +37,11 @@ module FollowTheJoker
           @initiative = false
         end
       end
+
+      def reset!
+        @jail = []
+        @dragon_head = nil
+      end
     end
   end
 end

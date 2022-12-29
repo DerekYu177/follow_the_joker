@@ -110,7 +110,7 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
     end
 
     context 'when one team has finished' do
-      it 'locks the other team in' do
+      before do
         game.users.each_slice(2).each do |winning_team_user, losing_team_user|
           finish(winning_team_user)
 
@@ -119,7 +119,9 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
             game.turn(losing_team_user, action: :play, cards: losing_team_user.cards.first)
           end
         end
+      end
 
+      it 'locks the other team in' do
         winning_team = game.teams.first
         winning_team.users.each do |user|
           expect(user).to(be_finished)
@@ -131,7 +133,30 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
         end
 
         expect(losing_team.jail).to(eq(losing_team.users))
+      end
+
+      it 'increments the priority_card' do
+        winning_team = game.teams.first
         expect(winning_team.priority_card).to(eq(5))
+      end
+
+      it 'raises if the next user tries to play' do
+        user = game.users.reject(&:finished?).first
+        expect { game.turn(user, action: :play, cards: user.cards.first) }
+          .to(raise_error(FollowTheJoker::Engine::RoundAlreadyFinishedError))
+      end
+
+      it 'resets for next round' do
+        game.next_round!
+
+        game.users.each do |user|
+          expect(user.cards.count).to(eq(FollowTheJoker::Engine::Deck::CARDS_PER_HAND))
+        end
+
+        game.teams.each do |team|
+          expect(team.dragon_head?).to(be_falsey)
+          expect(team.jail).to(be_empty)
+        end
       end
     end
   end

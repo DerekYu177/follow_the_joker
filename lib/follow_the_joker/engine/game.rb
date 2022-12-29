@@ -33,6 +33,7 @@ module FollowTheJoker
 
         @round = Round.new(self, priority_card: @teams.first.priority_card)
         @previous_rounds = []
+        @last_round_winner = nil
       end
 
       def turn(...)
@@ -45,13 +46,13 @@ module FollowTheJoker
 
       def round_finished!
         @teams.each(&:round_finished!)
+        @last_round_winner = @teams.select(&:dragon_head?).first
         @previous_rounds << @round
-
-        winning_team = @teams.select(&:dragon_head?).first
       end
 
       def next_round!
-        @round = Round.new(self, priority_card: winning_team.priority_card)
+        @teams.each(&:reset!)
+        @round = Round.new(self, priority_card: @last_round_winner.priority_card)
       end
 
       private
