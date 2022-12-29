@@ -13,12 +13,12 @@ module FollowTheJoker
       class << self
         def expand_rank_shorthand(shorthand)
           case shorthand
-          when "J" then JACK
-          when "Q" then QUEEN
-          when "K" then KING
-          when "A" then ACE
-          when "!" then LITTLE_JOKER
-          when "!*" then BIG_JOKER
+          when "J"  then Engine::Card::JACK
+          when "Q"  then Engine::Card::QUEEN
+          when "K"  then Engine::Card::KING
+          when "A"  then Engine::Card::ACE
+          when "lJ" then Engine::Card::LITTLE_JOKER
+          when "bJ" then Engine::Card::BIG_JOKER
           else
             shorthand.to_i
           end
@@ -48,6 +48,12 @@ module FollowTheJoker
 
           cards
         end
+
+        def all
+          @all ||= Engine::Deck.build.map do |card|
+            new(card).shorthand
+          end
+        end
       end
 
       attr_reader :card
@@ -69,8 +75,8 @@ module FollowTheJoker
         when Engine::Card::QUEEN then "Q"
         when Engine::Card::KING then "K"
         when Engine::Card::ACE then "A"
-        when Engine::Card::LITTLE_JOKER then "!"
-        when Engine::Card::BIG_JOKER then "!*"
+        when Engine::Card::LITTLE_JOKER then "lJ"
+        when Engine::Card::BIG_JOKER then "bJ"
         else
           card.original_rank.to_s
         end

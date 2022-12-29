@@ -38,7 +38,7 @@ module FollowTheJoker
       def parse_action(input)
         if input == "?"
           [:help, {}]
-        elsif input.include?(" ") || input.include?("-") # assume cards
+        elsif CLI::Card.all.include?(input) # assume cards
           [:play, { cards: CLI::Card.find(input, user: current_user) }]
         elsif input == "*"
           [:pile, {}]
