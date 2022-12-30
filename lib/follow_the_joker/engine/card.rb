@@ -21,21 +21,35 @@ module FollowTheJoker
 
       include Comparable
 
-      attr_reader :suit, :rank, :original_rank
+      attr_accessor :suit, :rank
+      attr_reader :original_rank
 
       class << self
         def humanize_rank(card)
-          case card.rank
+          humanized = case card.rank
           when JACK then "Jack"
           when QUEEN then "Queen"
           when KING then "King"
           when ACE then "Ace"
-          when PROMOTED_RANK then "#{card.original_rank} (Promoted)"
+          when PROMOTED_RANK then "#{card.original_rank}"
           when LITTLE_JOKER then "Little Joker"
           when BIG_JOKER then "Big Joker"
           else
             card.rank.to_s
           end
+
+          append = case card.original_rank
+          when PROMOTED_RANK
+            "(Promoted)"
+          when LITTLE_JOKER
+            "(as Little Joker)"
+          when BIG_JOKER
+            "(as Big Joker)"
+          else
+            nil
+          end unless card.rank == card.original_rank
+
+          [humanized, append].compact.join(" ")
         end
       end
 
@@ -59,7 +73,7 @@ module FollowTheJoker
       end
 
       def joker?
-        suit.nil? && JOKER_CARD_RANKS.include?(rank)
+        JOKER_CARD_RANKS.include?(original_rank)
       end
 
       def humanized_rank

@@ -39,6 +39,8 @@ module FollowTheJoker
         when 5
           raise GreaterFiveCardsRankRequiredError.new() unless greater_set_of_five?
         end
+
+        true
       end
 
       def record_with(user)
@@ -56,7 +58,7 @@ module FollowTheJoker
       end
 
       def equivalent_card_ranks?
-        cards.map(&:rank).uniq.size == 1
+        cards.map(&:rank).uniq.size == 1 || cards.reject(&:joker?).uniq.size == 1
       end
 
       def same_size_hand?
@@ -64,7 +66,7 @@ module FollowTheJoker
       end
 
       def greater_hand?
-        previous_cards.first.rank < cards.first.rank
+        previous_cards.sort_by(&:rank).first.rank < cards.sort_by(&:rank).first.rank
       end
     end
   end
