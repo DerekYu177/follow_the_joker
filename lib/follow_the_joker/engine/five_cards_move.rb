@@ -52,7 +52,7 @@ module FollowTheJoker
       def flush?
         jokers, regulars = cards.partition(&:joker?)
 
-        if jokers.present?
+        if jokers.any?
           cast_jokers_to(:suit, regulars.first.suit) if same_suit?(regulars)
         end
 
@@ -62,7 +62,7 @@ module FollowTheJoker
       def straight?
         jokers, regulars = cards.partition(&:joker?)
 
-        if jokers.present?
+        if jokers.any?
           missing = determine_missing_digits(regulars.map(&:original_rank))
           cast_jokers_to(:rank, missing) if jokers.count == missing.count
         end
@@ -73,7 +73,7 @@ module FollowTheJoker
       def three_plus_two?
         jokers, regulars = cards.partition(&:joker?)
 
-        if jokers.present?
+        if jokers.any?
           _minority_ranks, majority_ranks = regulars.group_by(&:rank).values.sort_by(&:size)
           majority_rank = majority_ranks.last.rank
           cast_jokers_to(:rank, majority_rank)
@@ -85,7 +85,7 @@ module FollowTheJoker
       def four_plus_one?
         jokers, regulars = cards.partition(&:joker?)
 
-        if jokers.present?
+        if jokers.any?
           _minority_ranks, majority_ranks = regulars.group_by(&:rank).values.sort_by(&:size)
           majority_rank = majority_ranks.last.rank
           cast_jokers_to(:rank, majority_rank)
@@ -101,7 +101,7 @@ module FollowTheJoker
       def five_of_a_kind?
         jokers, regulars = cards.partition(&:joker?)
 
-        if jokers.present?
+        if jokers.any?
           jokers = jokers.sort_by(&:rank)
           regulars = regulars.sort_by(&:original_rank)
 

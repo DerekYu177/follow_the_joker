@@ -13,11 +13,19 @@ module FollowTheJoker
         @game = game
 
         @users = game.users
-        deck = Deck.build_with(@users.count)
-        deck.cards.shuffle!(**shuffle_configuration)
-        deck.each_user(@users) do |user, cards|
-          user.hand_cards!(cards)
-          user.current_card = priority_card
+
+        if game.configuration[:cards_for_users].any?
+          @users.zip(game.configuration[:cards_for_users]).each do |user, cards|
+            user.hand_cards!(cards)
+            user.current_card = priority_card
+          end
+        else
+          deck = Deck.build_with(@users.count)
+          deck.cards.shuffle!(**shuffle_configuration)
+          deck.each_user(@users) do |user, cards|
+            user.hand_cards!(cards)
+            user.current_card = priority_card
+          end
         end
 
         @finished = false

@@ -10,6 +10,16 @@ require_relative 'user'
 module FollowTheJoker
   module CLI
     class Game < Engine::Game
+      def initialize(**configuration)
+        if configuration[:cards_for_users].any?
+          configuration[:cards_for_users] = configuration[:cards_for_users].map do |shorthands|
+            shorthands.split(" ").map { |shorthand| CLI::Card.to_engine_card(shorthand) }
+          end
+        end
+
+        super
+      end
+
       def start!
         loop do
           puts
@@ -20,10 +30,20 @@ module FollowTheJoker
           action, info = parse_action(input)
 
           turn(current_user, action: action, **info)
+
+          break if @game_finished
         end
+
+      puts "Thank you for playing!"
       rescue Interrupt
         puts
         puts "Exiting, thanks for playing!"
+      end
+
+      def round_finished!
+        super
+        puts "The winner is Team #{@last_round_winner.name} with members: #{@last_round_winner.users}"
+        @game_finished = true
       end
 
       private
@@ -38,7 +58,7 @@ module FollowTheJoker
       def parse_action(input)
         if input == "?"
           [:help, {}]
-        elsif CLI::Card.all.include?(input) # assume cards
+        elsif CLI::Card.all.include?(input) || input.include?(" ") # assume cards
           [:play, { cards: CLI::Card.find(input, user: current_user) }]
         elsif input == "*"
           [:pile, {}]

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../engine/card'
+
 module FollowTheJoker
   module CLI
     class Card
@@ -22,6 +24,15 @@ module FollowTheJoker
           else
             shorthand.to_i
           end
+        end
+
+        def to_engine_card(shorthand)
+          rank_shorthand, suit_shorthand = shorthand.split("-")
+
+          suit = SUIT_SHORTHANDS[suit_shorthand]
+          rank = expand_rank_shorthand(rank_shorthand)
+
+          Engine::Card.new(rank, suit: suit)
         end
 
         def find(input, user:)

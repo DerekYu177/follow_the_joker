@@ -22,9 +22,20 @@ settings = ::CLI.new do
     cast: Integer,
     description: "Sets the number of users. Must be an even number. Minimum 2."
   )
+  option(
+    :cards_for_users,
+    default: "",
+    cast: -> (o) { o.split(",") },
+    description: "Sets the cards per user using CSV-like format. Must be equal to the number of users."
+  )
 end.parse! do |settings|
   unless settings.number_of_users.even? && settings.number_of_users >= 2
     fail "Number of users must be an even number >= 2"
+  end
+
+  if settings.cards_for_users.any? && settings.cards_for_users.size != settings.number_of_users
+    fail "Cards (size: #{settings.cards_for_users.size}) are not equal to "\
+          "the number of users (size: #{settings.number_of_users})!"
   end
 end
 
