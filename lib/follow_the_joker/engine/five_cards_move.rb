@@ -53,10 +53,10 @@ module FollowTheJoker
         jokers, regulars = cards.partition(&:joker?)
 
         if jokers.present?
-          cast_jokers_to(:suit, regulars.first.suit) if regulars.map(&:suit).uniq.size == 1
+          cast_jokers_to(:suit, regulars.first.suit) if same_suit?(regulars)
         end
 
-        cards.map(&:suit).uniq.size == 1
+        same_suit?(cards)
       end
 
       def straight?
@@ -71,10 +71,26 @@ module FollowTheJoker
       end
 
       def three_plus_two?
+        jokers, regulars = cards.partition(&:joker?)
+
+        if jokers.present?
+          _minority_ranks, majority_ranks = regulars.group_by(&:rank).values.sort_by(&:size)
+          majority_rank = majority_ranks.last.rank
+          cast_jokers_to(:rank, majority_rank)
+        end
+
         group_of(3, 2)
       end
 
       def four_plus_one?
+        jokers, regulars = cards.partition(&:joker?)
+
+        if jokers.present?
+          _minority_ranks, majority_ranks = regulars.group_by(&:rank).values.sort_by(&:size)
+          majority_rank = majority_ranks.last.rank
+          cast_jokers_to(:rank, majority_rank)
+        end
+
         group_of(4, 1)
       end
 
@@ -103,6 +119,10 @@ module FollowTheJoker
 
       def consecutive?(list)
         list.sort.each_cons(2).all? { |a, b| b == a + 1 }
+      end
+
+      def same_suit?(list)
+        list.map(&:suit).uniq.size == 1
       end
 
       def determine_missing_digits(input, missing = [])
