@@ -11,9 +11,14 @@ Gem::Specification.new do |s|
   s.description   = "A game engine for the popular game 大怪路子."
   s.authors       = ["Derek Yu"]
   s.email         = "derek-nis@hotmail.com"
-  s.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
-  s.homepage      = ""
+  s.files = Dir.chdir(__dir__) do
+    `git ls-files -z`.split("\x0").reject do |f|
+      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
+    end
+  end
+  s.homepage      = "https://github.com/DerekYu177/follow_the_joker"
   s.license       = "MIT"
+  s.require_paths = ["lib"]
 
   s.add_runtime_dependency "cli", "~> 1.4.0"
 
