@@ -32,9 +32,7 @@ RSpec.describe(FollowTheJoker::Engine::Game) do
         game.turn(user, action: :play, cards: card)
 
         if !game.round.finished? && !user.finished?
-          until game.current_user == user
-            game.turn(game.current_user, action: :skip)
-          end
+          game.turn(game.current_user, action: :skip) until game.current_user == user
         end
       end
 

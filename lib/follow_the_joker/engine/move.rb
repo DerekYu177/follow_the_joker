@@ -37,7 +37,7 @@ module FollowTheJoker
         when 4
           raise FourCardsError
         when 5
-          raise GreaterFiveCardsRankRequiredError.new() unless greater_set_of_five?
+          raise GreaterFiveCardsRankRequiredError.new(previous_cards, cards) unless greater_set_of_five?
         end
 
         true
@@ -54,7 +54,7 @@ module FollowTheJoker
         current = FiveCardsMove.new(cards).value
         return false if previous == current
 
-        [ previous, current ].max == current
+        [previous, current].max == current
       end
 
       def equivalent_card_ranks?
@@ -66,7 +66,7 @@ module FollowTheJoker
       end
 
       def greater_hand?
-        previous_cards.sort_by(&:rank).first.rank < cards.sort_by(&:rank).first.rank
+        previous_cards.min_by(&:rank).rank < cards.min_by(&:rank).rank
       end
     end
   end

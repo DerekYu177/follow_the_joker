@@ -13,7 +13,7 @@ module FollowTheJoker
       def initialize(**configuration)
         if configuration[:cards_for_users].any?
           configuration[:cards_for_users] = configuration[:cards_for_users].map do |shorthands|
-            shorthands.split(" ").map { |shorthand| CLI::Card.to_engine_card(shorthand) }
+            shorthands.split.map { |shorthand| CLI::Card.to_engine_card(shorthand) }
           end
         end
 
@@ -34,10 +34,10 @@ module FollowTheJoker
           break if @game_finished
         end
 
-      puts "Thank you for playing!"
+        puts 'Thank you for playing!'
       rescue Interrupt
         puts
-        puts "Exiting, thanks for playing!"
+        puts 'Exiting, thanks for playing!'
       end
 
       def round_finished!
@@ -52,19 +52,19 @@ module FollowTheJoker
         "Type '?' for your cards | " \
           "Type '*' to see cards played this round | " \
           "Type '...' to skip your turn | " \
-          "Type the shorthand for your card to play it"
+          'Type the shorthand for your card to play it'
       end
 
       def parse_action(input)
-        if input == "?"
+        if input == '?'
           [:help, {}]
-        elsif CLI::Card.all.include?(input) || input.include?(" ") # assume cards
+        elsif CLI::Card.all.include?(input) || input.include?(' ') # assume cards
           [:play, { cards: CLI::Card.find(input, user: current_user) }]
-        elsif input == "*"
+        elsif input == '*'
           [:pile, {}]
-        elsif input == "..."
+        elsif input == '...'
           [:skip, {}]
-        elsif input == "debug"
+        elsif input == 'debug'
           [:debug, {}]
         else
           [input.to_sym, {}]
@@ -74,40 +74,49 @@ module FollowTheJoker
       def turn(user, action:, **kwargs)
         case action
         when :help
-          puts
-          puts "#{user.inspect}"
-          puts "#{CLI::User.new(user).hand}"
-          return
+          help(user)
         when :pile
-          puts
-          if round.current.first_move?
-            puts "You're the first to play this round!"
-          else
-            puts "Most recent first:"
-            puts round.current.plays.reverse
-          end
-
-          return
+          pile
         when :play, :skip
           begin
             super
           rescue FollowTheJoker::Engine::EngineError => e
-            puts "**ERROR** #{e.message.to_s}"
-            return
+            puts "**ERROR** #{e.message}"
           end
         when :debug
-          binding.pry
-          # random statement here
-          puts
+          debug
         else
           puts "unknown action: #{action}"
-          return
         end
+      end
+
+      def help(user)
+        puts
+        puts user
+        puts CLI::User.new(user).hand
+      end
+
+      def pile
+        puts
+        if round.current.first_move?
+          puts "You're the first to play this round!"
+        else
+          puts 'Most recent first:'
+          puts round.current.plays.reverse
+        end
+      end
+
+      def debug
+        # rubocop:disable Lint/Debugger
+        binding.pry
+        # rubocop:enable Lint/Debugger
+        # random statement here
+        puts
       end
 
       def end_round?
         super.tap do |result|
-          puts "No one challenged you! You may go again" if result
+          puts 'No one challenged you! You may go again' if result
         end
       end
     end

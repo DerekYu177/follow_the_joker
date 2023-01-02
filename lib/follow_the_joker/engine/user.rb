@@ -36,7 +36,7 @@ module FollowTheJoker
       def inspect
         "<#{name} (team #{team.name}) with #{cards.count} cards remaining>"
       end
-      alias_method :to_s, :inspect
+      alias to_s inspect
 
       def hand
         cards

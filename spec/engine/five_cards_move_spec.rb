@@ -26,11 +26,11 @@ RSpec.describe(FollowTheJoker::Engine::FiveCardsMove) do
   describe '#straight?' do
     let(:cards) do
       [
-        build(:card, "2-s"),
-        build(:card, "5-h"),
-        build(:card, "6-d"),
-        build(:card, "4-c"),
-        build(:card, "3-s"),
+        build(:card, '2-s'),
+        build(:card, '5-h'),
+        build(:card, '6-d'),
+        build(:card, '4-c'),
+        build(:card, '3-s'),
       ]
     end
 
@@ -42,10 +42,10 @@ RSpec.describe(FollowTheJoker::Engine::FiveCardsMove) do
       context 'is one' do
         let(:cards) do
           [
-            build(:card, "2-s"),
-            build(:card, "5-h"),
-            build(:card, "6-d"),
-            build(:card, "4-c"),
+            build(:card, '2-s'),
+            build(:card, '5-h'),
+            build(:card, '6-d'),
+            build(:card, '4-c'),
             build(:card, :lJ),
           ]
         end
@@ -58,9 +58,9 @@ RSpec.describe(FollowTheJoker::Engine::FiveCardsMove) do
       context 'is two' do
         let(:cards) do
           [
-            build(:card, "2-s"),
-            build(:card, "5-h"),
-            build(:card, "6-d"),
+            build(:card, '2-s'),
+            build(:card, '5-h'),
+            build(:card, '6-d'),
             build(:card, :bJ),
             build(:card, :lJ),
           ]
@@ -208,7 +208,7 @@ RSpec.describe(FollowTheJoker::Engine::FiveCardsMove) do
       end
 
       context 'is two' do
-         let(:cards) do
+        let(:cards) do
           [
             build(:card, rank: 9),
             build(:card, rank: 10),
@@ -318,7 +318,11 @@ RSpec.describe(FollowTheJoker::Engine::FiveCardsMove) do
 
         it { is_expected.to(be_a_five_of_a_kind) }
         it { is_expected.to(be_valid) }
-        it { expect(subject.value).to(eq([described_class::FIVE_OF_A_KIND, FollowTheJoker::Engine::Card::LITTLE_JOKER])) }
+
+        it do
+          expect(subject.value)
+            .to(eq([described_class::FIVE_OF_A_KIND, FollowTheJoker::Engine::Card::LITTLE_JOKER]))
+        end
       end
     end
   end

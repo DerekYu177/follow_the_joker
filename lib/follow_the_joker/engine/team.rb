@@ -27,9 +27,7 @@ module FollowTheJoker
         if dragon_head?
           score = @users.count - @jail.count
 
-          if @initiative == false
-            score -= 1
-          end
+          score -= 1 if @initiative == false
 
           @initiative = true
           @priority_card += score

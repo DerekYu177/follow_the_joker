@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'active_support'
 require_relative 'current'
 
 module FollowTheJoker
@@ -44,7 +45,7 @@ module FollowTheJoker
           raise "unknown action: #{action}"
         end
 
-        self.current.next
+        current.next
       end
 
       def finished?
@@ -61,15 +62,15 @@ module FollowTheJoker
         user.played!(cards)
         @current.reset_skip_counter
 
-        if user.finished?
-          @current.flush!
-          user.dragon_head! if dragon_head?(user)
+        return unless user.finished?
 
-          if finished?
-            @users.reject(&:finished?).each(&:lost!)
-            @game.round_finished!
-          end
-        end
+        @current.flush!
+        user.dragon_head! if dragon_head?(user)
+
+        return unless finished?
+
+        @users.reject(&:finished?).each(&:lost!)
+        @game.round_finished!
       end
 
       def dragon_head?(user)
@@ -81,13 +82,9 @@ module FollowTheJoker
       end
 
       def skip(user)
-        if @current.first_move?
-          binding.pry
-          raise CannotSkipError
-        else
-          @current.skip
-        end
+        raise CannotSkipError if @current.first_move?
 
+        @current.skip
         @current.record_skip(user: user)
       end
 

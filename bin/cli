@@ -1,10 +1,11 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
 require 'follow_the_joker/cli/game'
 require 'follow_the_joker/version'
 require 'cli'
 
-settings = ::CLI.new do
+settings = CLI.new do
   description 'Run Follow the Joker game via CLI'
   version FollowTheJoker::VERSION
 
@@ -13,33 +14,33 @@ settings = ::CLI.new do
     short: :s,
     default: -1,
     cast: Integer,
-    description: "Sets the value for Random.new() used for shuffling the deck",
+    description: 'Sets the value for Random.new() used for shuffling the deck',
   )
   option(
     :number_of_users,
     short: :n,
     default: 6,
     cast: Integer,
-    description: "Sets the number of users. Must be an even number. Minimum 2."
+    description: 'Sets the number of users. Must be an even number. Minimum 2.',
   )
   option(
     :cards_for_users,
-    default: "",
-    cast: -> (o) { o.split(",") },
-    description: "Sets the cards per user using CSV-like format. Must be equal to the number of users."
+    default: '',
+    cast: ->(o) { o.split(',') },
+    description: 'Sets the cards per user using CSV-like format. Must be equal to the number of users.',
   )
-end.parse! do |settings|
-  unless settings.number_of_users.even? && settings.number_of_users >= 2
-    fail "Number of users must be an even number >= 2"
-  end
+end
 
-  if settings.cards_for_users.any? && settings.cards_for_users.size != settings.number_of_users
-    fail "Cards (size: #{settings.cards_for_users.size}) are not equal to "\
-          "the number of users (size: #{settings.number_of_users})!"
+settings.parse! do |s|
+  raise 'Number of users must be an even number >= 2' unless s.number_of_users.even? && s.number_of_users >= 2
+
+  if s.cards_for_users.any? && s.cards_for_users.size != s.number_of_users
+    raise "Cards (size: #{s.cards_for_users.size}) are not equal to " \
+      "the number of users (size: #{s.number_of_users})!"
   end
 end
 
-settings.shuffle_seed = nil if settings.shuffle_seed < 0
+settings.shuffle_seed = nil if settings.shuffle_seed.negative?
 
 loop { ARGV.any? ? ARGV.pop : break } # breaks CLI
 FollowTheJoker::CLI::Game.new(**settings.to_h).start!

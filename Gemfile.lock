@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     follow_the_joker (0.0.2)
+      activesupport (~> 7.0.4)
       cli (~> 1.4.0)
 
 GEM

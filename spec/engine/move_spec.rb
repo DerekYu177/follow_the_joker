@@ -11,7 +11,7 @@ RSpec.describe(FollowTheJoker::Engine::Move) do
       let(:cards) do
         [
           build(:card, :lJ),
-          build(:card, :"5-s"),
+          build(:card, :'5-s'),
         ]
       end
 
@@ -20,8 +20,8 @@ RSpec.describe(FollowTheJoker::Engine::Move) do
       context 'when previous is higher' do
         let(:previous) do
           [
-            build(:card, :"6-s"),
-            build(:card, :"6-s"),
+            build(:card, :'6-s'),
+            build(:card, :'6-s'),
           ]
         end
 
@@ -31,8 +31,8 @@ RSpec.describe(FollowTheJoker::Engine::Move) do
       context 'when previous is lower' do
         let(:previous) do
           [
-            build(:card, :"3-s"),
-            build(:card, :"3-h"),
+            build(:card, :'3-s'),
+            build(:card, :'3-h'),
           ]
         end
 

@@ -10,7 +10,7 @@ module FollowTheJoker
 
       class << self
         def build_with(user_count)
-          cards = (user_count / 2).times.map { self.build }.flatten
+          cards = (user_count / 2).times.map { build }.flatten
           Deck.new(cards)
         end
 

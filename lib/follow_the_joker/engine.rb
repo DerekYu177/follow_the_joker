@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative 'engine/card'
 require_relative 'engine/user'
 require_relative 'engine/game'
@@ -11,6 +13,7 @@ module FollowTheJoker
 
     class CardsError < EngineError
       attr_reader :previous, :current
+
       def initialize(previous, current)
         @previous = previous
         @current = current
@@ -25,21 +28,21 @@ module FollowTheJoker
         current_rank = current.map(&:rank).uniq.first
 
         "Previous hand was #{previous} with rank #{previous_rank}. " \
-        "You'll need to play a card(s) with rank of at least #{previous_rank + 1}. " \
-        "You currently played #{current} with rank #{current_rank}"
+          "You'll need to play a card(s) with rank of at least #{previous_rank + 1}. " \
+          "You currently played #{current} with rank #{current_rank}"
       end
     end
 
     class CardCountMismatchError < CardsError
       def message
         "Previous hand was #{previous} with size #{previous.size}. " \
-        "Current hand was #{current}, with size #{current.size}"
+          "Current hand was #{current}, with size #{current.size}"
       end
     end
 
     class CardRankNotSame < CardsError
       def message
-        cards = current.group_by { |card| card.rank }.values
+        cards = current.group_by(&:rank).values
         minority = cards.min { |a, b| a.size <=> b.size }
         majority = cards.flatten - minority
 
@@ -55,8 +58,8 @@ module FollowTheJoker
 
     class InvalidSetOfFiveError < CardsError
       def message
-        "Not a valid set of five. " \
-        "You played: #{current}"
+        'Not a valid set of five. ' \
+          "You played: #{current}"
       end
     end
 
@@ -68,7 +71,7 @@ module FollowTheJoker
 
     class RoundAlreadyFinishedError < EngineError
       def message
-        "Further moves cannot be played because the match has finished."
+        'Further moves cannot be played because the match has finished.'
       end
     end
   end

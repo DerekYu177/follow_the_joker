@@ -9,13 +9,13 @@ require_relative 'round'
 module FollowTheJoker
   module Engine
     class Game
-      FAMILY_MEMBERS = %w(Ba Ma R RR)
+      FAMILY_MEMBERS = %w(Ba Ma R RR).freeze
 
       attr_accessor :users
       attr_reader(
         :configuration,
         :teams,
-        :round
+        :round,
       )
 
       def initialize(**configuration)
@@ -27,9 +27,9 @@ module FollowTheJoker
 
         @configuration = configuration
 
-        @teams = configuration[:number_of_teams].times.map { |i| Team.new(i+1) }
+        @teams = configuration[:number_of_teams].times.map { |i| Team.new(i + 1) }
         @teams.first.initiative = true
-        @users = build_users(configuration[:number_of_users], teams: @teams)
+        @users = build_users(configuration[:number_of_users])
 
         @round = Round.new(self, priority_card: @teams.first.priority_card)
         @previous_rounds = []
@@ -57,12 +57,11 @@ module FollowTheJoker
 
       private
 
-      def build_users(number_of_users, teams:)
+      def build_users(number_of_users)
         users = []
 
         names = FAMILY_MEMBERS[0...number_of_users] +
-          (number_of_users - FAMILY_MEMBERS.size)
-            .times.map { |i| "RandomUser-1" }
+                (number_of_users - FAMILY_MEMBERS.size).times.map { |i| "RandomUser-#{i}" }
 
         names.each_with_index do |name, i|
           team = @teams[i % @teams.size]

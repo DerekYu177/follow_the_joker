@@ -4,7 +4,7 @@ require_relative '../../lib/follow_the_joker/engine/deck'
 require_relative '../../lib/follow_the_joker/cli/card'
 
 FactoryBot.define do
-  factory :card, class: "FollowTheJoker::Engine::Card" do
+  factory :card, class: 'FollowTheJoker::Engine::Card' do
     suit { 'Spades' }
     rank { 2 }
 

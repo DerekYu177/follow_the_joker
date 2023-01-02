@@ -18,7 +18,7 @@ module FollowTheJoker
 
       def value
         # always call valid before hand
-        [ type, rank ]
+        [type, rank]
       end
 
       def type
@@ -37,7 +37,7 @@ module FollowTheJoker
         when FIVE_OF_A_KIND
           group_of(5).first
         when STRAIGHT_FLUSH, STRAIGHT, FLUSH
-          cards.map(&:rank).sort.last
+          cards.map(&:rank).max
         when FOUR_PLUS_ONE
           group_of(4, 1).first
         when THREE_PLUS_TWO
@@ -52,9 +52,7 @@ module FollowTheJoker
       def flush?
         jokers, regulars = cards.partition(&:joker?)
 
-        if jokers.present?
-          cast_jokers_to(:suit, regulars.first.suit) if same_suit?(regulars)
-        end
+        cast_jokers_to(:suit, regulars.first.suit) if jokers.present? && same_suit?(regulars)
 
         same_suit?(cards)
       end
@@ -135,23 +133,21 @@ module FollowTheJoker
         return missing if input.size == 5
 
         if consecutive?(input)
-          highest_value = input.last
           lowest_value = input.first
+          highest_value = input.last
 
-          if highest_value == FollowTheJoker::Engine::Card::SUIT_CARD_RANKS.last
-            missing << lowest_value - 1
-          else
-            missing << highest_value + 1
-          end
+          missing << if highest_value == FollowTheJoker::Engine::Card::SUIT_CARD_RANKS.last
+                       lowest_value - 1
+                     else
+                       highest_value + 1
+                     end
         else
           normalized_input = input.map { |i| i - input.first }
           gap = ([*0..4] - normalized_input).map { |i| i + input.first }
           missing.push(*gap)
         end
 
-        if missing.size + input.size < 5
-          run(input + missing, missing)
-        end
+        run(input + missing, missing) if missing.size + input.size < 5
 
         missing
       end
@@ -160,9 +156,10 @@ module FollowTheJoker
         jokers = cards.select(&:joker?)
         values = values.is_a?(Array) ? values : [values] * jokers.size
 
-        if type == :rank
+        case type
+        when :rank
           jokers.zip(values).each { |joker, rank| joker.rank = rank }
-        elsif type == :suit
+        when :suit
           jokers.zip(values).each { |joker, suit| joker.suit = suit }
         end
       end
