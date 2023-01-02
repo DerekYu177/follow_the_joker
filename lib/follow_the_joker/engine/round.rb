@@ -14,7 +14,7 @@ module FollowTheJoker
 
         @users = game.users
 
-        if game.configuration[:cards_for_users].any?
+        if game.configuration[:cards_for_users].present?
           @users.zip(game.configuration[:cards_for_users]).each do |user, cards|
             user.hand_cards!(cards)
             user.current_card = priority_card
